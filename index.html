@@ -7,10 +7,6 @@
   <style>
     :root {
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --glass-bg: rgba(255,255,255,0.12);
-      --glass-border: rgba(255,255,255,0.18);
-      --glass-bg-dark: rgba(0,0,0,0.35);
-      --glass-border-dark: rgba(255,255,255,0.08);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,18 +36,29 @@
     .hero-bg {
       position: absolute;
       inset: 0;
-      background: url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=1920&q=80') center/cover no-repeat;
       z-index: 0;
     }
-    .hero-bg::after {
-      content: '';
+    .hero-slide {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0.6) 60%, rgba(10,10,15,0.95) 100%);
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.8s ease-in-out;
+      z-index: 0;
+    }
+    .hero-slide.active {
+      opacity: 1;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(6,6,10,0.55) 0%, rgba(6,6,10,0.75) 40%, rgba(6,6,10,0.92) 75%, rgba(6,6,10,0.98) 100%);
+      z-index: 1;
     }
     .hero-content {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       padding: 0 24px;
       max-width: 700px;
     }
@@ -59,12 +66,12 @@
       width: 64px; height: 64px;
       margin: 0 auto 20px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.08);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.12);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
     .hero-logo svg { width: 32px; height: 32px; color: #fff; }
     .hero h1 {
@@ -72,14 +79,14 @@
       font-weight: 700;
       letter-spacing: 2px;
       line-height: 1.05;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+      text-shadow: 0 4px 30px rgba(0,0,0,0.6);
       margin-bottom: 12px;
     }
     .hero p {
       font-size: clamp(16px, 3vw, 22px);
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.7);
       font-weight: 400;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
       margin-bottom: 28px;
     }
     .hero .live-pill {
@@ -88,8 +95,8 @@
       gap: 8px;
       padding: 8px 18px;
       border-radius: 30px;
-      background: rgba(34,197,94,0.15);
-      border: 1px solid rgba(34,197,94,0.3);
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.25);
       font-size: 14px;
       font-weight: 600;
       color: #4ade80;
@@ -100,36 +107,36 @@
       width: 8px; height: 8px;
       border-radius: 50%;
       background: #4ade80;
-      box-shadow: 0 0 8px #4ade80;
+      box-shadow: 0 0 10px #4ade80;
     }
     .hero .live-pill.playing .dot {
       animation: pulse-dot 1.8s infinite ease-in-out;
     }
     @keyframes pulse-dot {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 0.35; transform: scale(0.8); }
     }
     .scroll-hint {
       position: absolute;
       bottom: 28px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 1;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 6px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.45);
       font-size: 12px;
       letter-spacing: 1px;
       text-transform: uppercase;
-      animation: bounce 2s infinite;
+      animation: bounce 2.5s infinite;
     }
     .scroll-hint svg { width: 20px; height: 20px; }
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-      40% { transform: translateX(-50%) translateY(-8px); }
-      60% { transform: translateX(-50%) translateY(-4px); }
+      40% { transform: translateX(-50%) translateY(-10px); }
+      60% { transform: translateX(-50%) translateY(-5px); }
     }
 
     /* ===== GALLERY ===== */
@@ -148,7 +155,7 @@
     }
     .gallery-section .subtitle {
       text-align: center;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.45);
       font-size: 15px;
       margin-bottom: 36px;
     }
@@ -168,30 +175,16 @@
     }
     .gallery-item:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
     .gallery-item img {
       width: 100%; height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.5s ease;
+      transition: transform 0.6s ease;
     }
     .gallery-item:hover img {
-      transform: scale(1.05);
-    }
-    .gallery-item .placeholder {
-      width: 100%; height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      color: rgba(255,255,255,0.25);
-      font-size: 14px;
-    }
-    .gallery-item .placeholder svg {
-      width: 36px; height: 36px;
-      opacity: 0.4;
+      transform: scale(1.06);
     }
 
     /* ===== CTA ===== */
@@ -204,8 +197,8 @@
       display: block;
       text-decoration: none;
       color: inherit;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: 16px;
       padding: 24px;
       display: flex;
@@ -215,26 +208,26 @@
       backdrop-filter: blur(8px);
     }
     .cta-card:hover {
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     }
     .cta-icon {
       width: 52px; height: 52px;
       border-radius: 14px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .cta-icon svg { width: 24px; height: 24px; color: rgba(255,255,255,0.7); }
+    .cta-icon svg { width: 24px; height: 24px; color: rgba(255,255,255,0.65); }
     .cta-text { flex: 1; }
     .cta-text .title { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
-    .cta-text .desc { font-size: 14px; color: rgba(255,255,255,0.45); }
+    .cta-text .desc { font-size: 14px; color: rgba(255,255,255,0.4); }
     .cta-arrow {
       width: 20px; height: 20px;
-      color: rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.3);
       flex-shrink: 0;
       transition: transform 0.2s ease, color 0.2s ease;
     }
@@ -252,20 +245,20 @@
       z-index: 100;
       width: calc(100% - 40px);
       max-width: 620px;
-      background: var(--glass-bg-dark);
-      backdrop-filter: blur(24px) saturate(1.4);
-      -webkit-backdrop-filter: blur(24px) saturate(1.4);
-      border: 1px solid var(--glass-border-dark);
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(28px) saturate(1.5);
+      -webkit-backdrop-filter: blur(28px) saturate(1.5);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 20px;
       padding: 14px 20px;
       display: flex;
       align-items: center;
       gap: 16px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03) inset;
       transition: box-shadow 0.3s ease;
     }
     .player-bar:hover {
-      box-shadow: 0 12px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06) inset;
+      box-shadow: 0 14px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05) inset;
     }
     .player-btn {
       width: 52px; height: 52px;
@@ -277,7 +270,7 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       transition: transform 0.15s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
     }
     .player-btn:hover { transform: scale(1.06); }
     .player-btn:active { transform: scale(0.95); }
@@ -296,7 +289,7 @@
     }
     .player-meta .status {
       font-size: 13px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.45);
       min-height: 20px;
       transition: color 0.2s ease;
     }
@@ -310,7 +303,7 @@
       gap: 8px;
       flex-shrink: 0;
     }
-    .player-vol svg { width: 20px; height: 20px; color: rgba(255,255,255,0.5); }
+    .player-vol svg { width: 20px; height: 20px; color: rgba(255,255,255,0.45); }
     .player-vol input[type="range"] {
       width: 90px;
       accent-color: #fff;
@@ -322,7 +315,7 @@
       text-align: center;
       padding: 0 20px 120px;
       font-size: 12px;
-      color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.22);
       letter-spacing: 0.5px;
     }
 
@@ -341,7 +334,14 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg"></div>
+    <div class="hero-bg">
+      <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=1920&q=80')"></div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=1920&q=80')"></div>
+      <div class="hero-overlay"></div>
+    </div>
+
     <div class="hero-content">
       <div class="hero-logo">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -357,6 +357,7 @@
         LIVE
       </div>
     </div>
+
     <div class="scroll-hint">
       <span>Scorri</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -371,28 +372,16 @@
     <p class="subtitle">Momenti, suoni e colori della nostra radio</p>
     <div class="gallery-grid">
       <div class="gallery-item">
-        <div class="placeholder">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
-          <span>Foto 1</span>
-        </div>
+        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80" alt="Studio radio">
       </div>
       <div class="gallery-item">
-        <div class="placeholder">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
-          <span>Foto 2</span>
-        </div>
+        <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80" alt="Mixer audio">
       </div>
       <div class="gallery-item">
-        <div class="placeholder">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
-          <span>Foto 3</span>
-        </div>
+        <img src="https://images.unsplash.com/photo-1459749411177-0473ef716175?w=800&q=80" alt="Cuffie">
       </div>
       <div class="gallery-item">
-        <div class="placeholder">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
-          <span>Foto 4</span>
-        </div>
+        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80" alt="Concerto">
       </div>
     </div>
   </section>
@@ -422,11 +411,9 @@
   <!-- PLAYER BAR (STICKY BOTTOM CENTER) -->
   <div class="player-bar" id="player-bar">
     <button class="player-btn" id="play-btn" aria-label="Play / Stop">
-      <!-- Play -->
       <svg id="icon-play" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.76253 3.10547C8.25778 3.10552 8.74424 3.23849 9.17073 3.49023L19.533 9.60742C20.8536 10.3869 21.2923 12.0901 20.5174 13.4121C20.2785 13.8195 19.9398 14.1604 19.533 14.4004L9.16975 20.5156C7.84722 21.2958 6.14596 20.8511 5.36995 19.5273C5.11962 19.1003 4.9872 18.6142 4.98714 18.1191V5.88672C4.98717 4.3537 6.22731 3.10547 7.76253 3.10547ZM6.78792 18.1191C6.78798 18.2945 6.83431 18.4664 6.92268 18.6172C7.19639 19.0841 7.79338 19.2377 8.25569 18.9648L18.618 12.8496C18.7607 12.7654 18.8803 12.6458 18.9647 12.502C19.2393 12.0334 19.082 11.4311 18.618 11.1572L8.25569 5.04102C8.10612 4.95273 7.93564 4.9063 7.76253 4.90625C7.22705 4.90625 6.78795 5.34218 6.78792 5.88672V18.1191Z" fill="currentColor"/>
       </svg>
-      <!-- Stop -->
       <svg id="icon-stop" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M7.78027 8.90405C7.5 9.45411 7.5 10.1742 7.5 11.6144V12.3856C7.5 13.8258 7.5 14.5459 7.78027 15.096C8.02681 15.5798 8.42019 15.9732 8.90405 16.2197C9.45411 16.5 10.1742 16.5 11.6144 16.5H12.3856C13.8258 16.5 14.5459 16.5 15.096 16.2197C15.5798 15.9732 15.9732 15.5798 16.2197 15.096C16.5 14.5459 16.5 13.8258 16.5 12.3856V11.6144C16.5 10.1742 16.5 9.45411 16.2197 8.90405C15.9732 8.42019 15.5798 8.02681 15.096 7.78027C14.5459 7.5 13.8258 7.5 12.3856 7.5H11.6144C10.1742 7.5 9.45411 7.5 8.90405 7.78027C8.42019 8.02681 8.02681 8.42019 7.78027 8.90405Z" fill="currentColor"/>
       </svg>
@@ -451,6 +438,16 @@
 
   <script>
     (function() {
+      /* ===== SLIDESHOW HERO ===== */
+      var slides = document.querySelectorAll('.hero-slide');
+      var currentSlide = 0;
+      setInterval(function() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+      }, 5000);
+
+      /* ===== PLAYER ===== */
       var audio = document.getElementById('radio-audio');
       var btn = document.getElementById('play-btn');
       var iconPlay = document.getElementById('icon-play');
@@ -459,11 +456,10 @@
       var vol = document.getElementById('volume');
       var pill = document.getElementById('live-pill');
       var playing = false;
-      var isStopping = false;  // FLAG per evitare falso errore
+      var isStopping = false;
 
       audio.volume = 0.8;
 
-      // Gestione errore — ignora se stiamo fermando manualmente
       audio.addEventListener('error', function() {
         if (isStopping) return;
         var err = audio.error;
@@ -486,7 +482,6 @@
 
       btn.addEventListener('click', function() {
         if (playing) {
-          // STOP pulito — attiva flag per ignorare errori
           isStopping = true;
           audio.pause();
           audio.removeAttribute('src');
@@ -497,7 +492,6 @@
           status.textContent = 'Clicca play per ascoltare';
           status.classList.remove('error');
           pill.classList.remove('playing');
-          // Rilascia flag dopo breve delay
           setTimeout(function() { isStopping = false; }, 200);
         } else {
           status.textContent = 'Connessione in corso...';
@@ -509,8 +503,7 @@
             iconStop.style.display = '';
             status.textContent = 'Streaming in corso...';
             pill.classList.add('playing');
-          }).catch(function(err) {
-            // REINDIRIZZAMENTO AUTOMATICO su errore play
+          }).catch(function() {
             status.textContent = 'Apertura pannello...';
             window.location.href = 'https://nr12.newradio.it/public/8664';
           });
