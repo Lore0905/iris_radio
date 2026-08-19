@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIO IRIS — Alza la musica, abbassa i pensieri</title>
+  <style>
+    :root {
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --glass-bg: rgba(255,255,255,0.12);
+      --glass-border: rgba(255,255,255,0.18);
+      --glass-bg-dark: rgba(0,0,0,0.35);
+      --glass-border-dark: rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: #0a0a0f;
+      color: #f0f0f0;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=1920&q=80') center/cover no-repeat;
+      z-index: 0;
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0.6) 60%, rgba(10,10,15,0.95) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px;
+      max-width: 700px;
+    }
+    .hero-logo {
+      width: 64px; height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .hero-logo svg { width: 32px; height: 32px; color: #fff; }
+    .hero h1 {
+      font-size: clamp(36px, 8vw, 72px);
+      font-weight: 700;
+      letter-spacing: 2px;
+      line-height: 1.05;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: clamp(16px, 3vw, 22px);
+      color: rgba(255,255,255,0.75);
+      font-weight: 400;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      margin-bottom: 28px;
+    }
+    .hero .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 30px;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      font-size: 14px;
+      font-weight: 600;
+      color: #4ade80;
+      letter-spacing: 0.8px;
+      backdrop-filter: blur(8px);
+    }
+    .hero .live-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+    }
+    .hero .live-pill.playing .dot {
+      animation: pulse-dot 1.8s infinite ease-in-out;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+    .scroll-hint svg { width: 20px; height: 20px; }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+      40% { transform: translateX(-50%) translateY(-8px); }
+      60% { transform: translateX(-50%) translateY(-4px); }
+    }
+
+    /* ===== GALLERY ===== */
+    .gallery-section {
+      position: relative;
+      z-index: 1;
+      padding: 80px 20px 140px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .gallery-section h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .gallery-section .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 15px;
+      margin-bottom: 36px;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .gallery-item {
+      aspect-ratio: 4 / 3;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background: #1a1a24;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    .gallery-item .placeholder {
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.25);
+      font-size: 14px;
+    }
+    .gallery-item .placeholder svg {
+      width: 36px; height: 36px;
+      opacity: 0.4;
+    }
+
+    /* ===== CTA ===== */
+    .cta-section {
+      padding: 0 20px 120px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .cta-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+    }
+    .cta-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .cta-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .cta-icon svg { width: 24px; height: 24px; color: rgba(255,255,255,0.7); }
+    .cta-text { flex: 1; }
+    .cta-text .title { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+    .cta-text .desc { font-size: 14px; color: rgba(255,255,255,0.45); }
+    .cta-arrow {
+      width: 20px; height: 20px;
+      color: rgba(255,255,255,0.35);
+      flex-shrink: 0;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+    .cta-card:hover .cta-arrow {
+      transform: translateX(3px);
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ===== PLAYER BAR (STICKY) ===== */
+    .player-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 40px);
+      max-width: 620px;
+      background: var(--glass-bg-dark);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border: 1px solid var(--glass-border-dark);
+      border-radius: 20px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      transition: box-shadow 0.3s ease;
+    }
+    .player-bar:hover {
+      box-shadow: 0 12px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06) inset;
+    }
+    .player-btn {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: #fff;
+      color: #0a0a0f;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+    .player-btn:hover { transform: scale(1.06); }
+    .player-btn:active { transform: scale(0.95); }
+    .player-btn svg { width: 22px; height: 22px; }
+
+    .player-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .player-meta .title {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .player-meta .status {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      min-height: 20px;
+      transition: color 0.2s ease;
+    }
+    .player-meta .status.error {
+      color: #f87171;
+    }
+
+    .player-vol {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .player-vol svg { width: 20px; height: 20px; color: rgba(255,255,255,0.5); }
+    .player-vol input[type="range"] {
+      width: 90px;
+      accent-color: #fff;
+      cursor: pointer;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 0 20px 120px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 560px) {
+      .player-bar { padding: 12px 16px; gap: 12px; }
+      .player-btn { width: 46px; height: 46px; }
+      .player-btn svg { width: 18px; height: 18px; }
+      .player-vol input[type="range"] { width: 70px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .gallery-section { padding: 60px 16px 140px; }
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M8 12.0993C8.49691 12.0993 8.90016 12.5028 8.90039 12.9997V17.9997C8.90039 19.6013 7.60163 20.9001 6 20.9001C4.39837 20.9001 3.09961 19.6013 3.09961 17.9997C3.09984 16.3982 4.39852 15.0993 6 15.0993C6.38939 15.0993 6.76033 15.1778 7.09961 15.317V12.9997C7.09984 12.5028 7.50309 12.0993 8 12.0993ZM6 16.9001C5.39263 16.9001 4.90062 17.3923 4.90039 17.9997C4.90039 18.6072 5.39249 19.0993 6 19.0993C6.60751 19.0993 7.09961 18.6072 7.09961 17.9997C7.09938 17.3923 6.60737 16.9001 6 16.9001Z" fill="currentColor"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M18.627 3.35611C19.8025 3.12106 20.9001 4.02068 20.9004 5.21939V15.9997C20.9004 17.6013 19.6016 18.9001 18 18.9001C16.3984 18.9001 15.0996 17.6013 15.0996 15.9997C15.0998 14.3982 16.3985 13.0993 18 13.0993C18.3894 13.0993 18.7603 13.1778 19.0996 13.317V9.21939C19.0993 9.15657 19.0421 9.10946 18.9805 9.12173L12.6768 10.3825C12.1894 10.4799 11.7148 10.1637 11.6172 9.67642C11.52 9.18922 11.8361 8.71439 12.3232 8.61685L18.627 7.35611C18.7868 7.32415 18.9452 7.31502 19.0996 7.32291V5.21939C19.0993 5.15657 19.0421 5.10946 18.9805 5.12173L12.6768 6.38248C12.1894 6.47994 11.7148 6.16372 11.6172 5.67642C11.52 5.18922 11.8361 4.71439 12.3232 4.61685L18.627 3.35611ZM18 14.9001C17.3926 14.9001 16.9006 15.3923 16.9004 15.9997C16.9004 16.6072 17.3925 17.0993 18 17.0993C18.6075 17.0993 19.0996 16.6072 19.0996 15.9997C19.0994 15.3923 18.6074 14.9001 18 14.9001Z" fill="currentColor"/>
+          <path d="M7.32422 5.38931C7.61669 4.87032 8.38346 4.87015 8.67578 5.38931L8.73047 5.50845L8.89551 5.95376L8.97949 6.1481C9.19937 6.58817 9.57968 6.93145 10.0459 7.10415L10.4912 7.26919C11.127 7.50461 11.1666 8.36217 10.6104 8.67544L10.4912 8.73013L10.0459 8.89517C9.5799 9.06783 9.19939 9.41141 8.97949 9.85123L8.89551 10.0456L8.73047 10.4909C8.49495 11.1267 7.63737 11.1665 7.32422 10.61L7.26953 10.4909L7.10449 10.0456C6.93172 9.57931 6.58767 9.19898 6.14746 8.97916L5.9541 8.89517L5.50879 8.73013C4.83054 8.47903 4.83061 7.52037 5.50879 7.26919L5.9541 7.10415L6.14746 7.02017C6.58757 6.80032 6.93176 6.41995 7.10449 5.95376L7.26953 5.50845L7.32422 5.38931Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h1>RADIO IRIS</h1>
+      <p>Alza la musica e abbassa i pensieri<br>con uno sguardo verso il cielo</p>
+      <div class="live-pill" id="live-pill">
+        <span class="dot"></span>
+        LIVE
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scorri</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery-section">
+    <h2>Galleria</h2>
+    <p class="subtitle">Momenti, suoni e colori della nostra radio</p>
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <div class="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
+          <span>Foto 1</span>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <div class="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
+          <span>Foto 2</span>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <div class="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
+          <span>Foto 3</span>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <div class="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V14.5858L16.7071 11.2929C16.3166 10.9024 15.6834 10.9024 15.2929 11.2929L13 13.5858L9.70711 10.2929C9.31658 9.90237 8.68342 9.90237 8.29289 10.2929L4 14.5858V6Z" fill="currentColor"/></svg>
+          <span>Foto 4</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <a href="https://nr12.newradio.it/public/8664" target="_blank" rel="noopener noreferrer" class="cta-card">
+      <div class="cta-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M3.97427 8.06961C4.99348 7.33581 6.18946 7.1 7.00001 7.1H9.00001C9.49706 7.1 9.90001 7.50294 9.90001 8C9.90001 8.49706 9.49706 8.9 9.00001 8.9H7.00001C6.47755 8.9 5.67353 9.06419 5.02599 9.53039C4.42434 9.96356 3.90001 10.6934 3.90001 12C3.90001 13.3066 4.42434 14.0364 5.02599 14.4696C5.67353 14.9358 6.47755 15.1 7.00001 15.1H9.00001C9.49706 15.1 9.90001 15.5029 9.90001 16C9.90001 16.4971 9.49706 16.9 9.00001 16.9H7.00001C6.18946 16.9 4.99348 16.6642 3.97427 15.9304C2.90917 15.1636 2.10001 13.8934 2.10001 12C2.10001 10.1066 2.90917 8.83644 3.97427 8.06961ZM14.1 8C14.1 7.50294 14.5029 7.1 15 7.1H17C17.8105 7.1 19.0065 7.33581 20.0257 8.06961C21.0908 8.83644 21.9 10.1066 21.9 12C21.9 13.8934 21.0908 15.1636 20.0257 15.9304C19.0065 16.6642 17.8105 16.9 17 16.9H15C14.5029 16.9 14.1 16.4971 14.1 16C14.1 15.5029 14.5029 15.1 15 15.1H17C17.5225 15.1 18.3265 14.9358 18.974 14.4696C19.5757 14.0364 20.1 13.3066 20.1 12C20.1 10.6934 19.5757 9.96356 18.974 9.53039C18.3265 9.06419 17.5225 8.9 17 8.9H15C14.5029 8.9 14.1 8.49706 14.1 8ZM7.10001 12C7.10001 11.5029 7.50295 11.1 8.00001 11.1H16C16.4971 11.1 16.9 11.5029 16.9 12C16.9 12.4971 16.4971 12.9 16 12.9H8.00001C7.50295 12.9 7.10001 12.4971 7.10001 12Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="cta-text">
+        <div class="title">Pannello pubblico Newradio</div>
+        <div class="desc">Vai alla pagina ufficiale dello stream</div>
+      </div>
+      <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.8858 4.91303C19.884 4.41725 19.4816 4.01629 18.9858 4.01629L11.1532 4.01629C10.6562 4.01629 10.2532 4.41923 10.2532 4.91629C10.2532 5.41334 10.6562 5.81629 11.1532 5.81629L16.8161 5.81629L4.29345 18.3642C3.94233 18.7161 3.94291 19.2859 4.29473 19.637C4.64656 19.9882 5.21641 19.9876 5.56752 19.6358L18.0936 7.08434L18.1142 12.7805C18.116 13.2775 18.5204 13.679 19.0175 13.6772C19.5145 13.6754 19.916 13.271 19.9142 12.774L19.8858 4.91303Z" fill="currentColor"/>
+      </svg>
+    </a>
+  </section>
+
+  <footer class="footer">
+    RADIO IRIS — In onda dal cielo
+  </footer>
+
+  <!-- PLAYER BAR (STICKY BOTTOM CENTER) -->
+  <div class="player-bar" id="player-bar">
+    <button class="player-btn" id="play-btn" aria-label="Play / Stop">
+      <!-- Play -->
+      <svg id="icon-play" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.76253 3.10547C8.25778 3.10552 8.74424 3.23849 9.17073 3.49023L19.533 9.60742C20.8536 10.3869 21.2923 12.0901 20.5174 13.4121C20.2785 13.8195 19.9398 14.1604 19.533 14.4004L9.16975 20.5156C7.84722 21.2958 6.14596 20.8511 5.36995 19.5273C5.11962 19.1003 4.9872 18.6142 4.98714 18.1191V5.88672C4.98717 4.3537 6.22731 3.10547 7.76253 3.10547ZM6.78792 18.1191C6.78798 18.2945 6.83431 18.4664 6.92268 18.6172C7.19639 19.0841 7.79338 19.2377 8.25569 18.9648L18.618 12.8496C18.7607 12.7654 18.8803 12.6458 18.9647 12.502C19.2393 12.0334 19.082 11.4311 18.618 11.1572L8.25569 5.04102C8.10612 4.95273 7.93564 4.9063 7.76253 4.90625C7.22705 4.90625 6.78795 5.34218 6.78792 5.88672V18.1191Z" fill="currentColor"/>
+      </svg>
+      <!-- Stop -->
+      <svg id="icon-stop" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.78027 8.90405C7.5 9.45411 7.5 10.1742 7.5 11.6144V12.3856C7.5 13.8258 7.5 14.5459 7.78027 15.096C8.02681 15.5798 8.42019 15.9732 8.90405 16.2197C9.45411 16.5 10.1742 16.5 11.6144 16.5H12.3856C13.8258 16.5 14.5459 16.5 15.096 16.2197C15.5798 15.9732 15.9732 15.5798 16.2197 15.096C16.5 14.5459 16.5 13.8258 16.5 12.3856V11.6144C16.5 10.1742 16.5 9.45411 16.2197 8.90405C15.9732 8.42019 15.5798 8.02681 15.096 7.78027C14.5459 7.5 13.8258 7.5 12.3856 7.5H11.6144C10.1742 7.5 9.45411 7.5 8.90405 7.78027C8.42019 8.02681 8.02681 8.42019 7.78027 8.90405Z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <div class="player-meta">
+      <div class="title">RADIO IRIS</div>
+      <div class="status" id="player-status">Clicca play per ascoltare</div>
+    </div>
+
+    <div class="player-vol">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.84183 2.83114C10.6204 1.29521 13.4589 2.54123 13.459 4.962V19.1925C13.4588 21.6277 10.5649 22.9021 8.76859 21.2579L5.04202 17.8458H4.85745C3.31142 17.8455 2.0579 16.592 2.05765 15.046V9.47274C2.05765 7.94733 3.27601 6.71178 4.78323 6.67294H4.92972L5.01175 6.67489L8.67288 2.98934L8.84183 2.83114ZM11.6592 4.962C11.6591 4.06973 10.5792 3.62434 9.95023 4.25692L5.74124 8.4952L4.88284 8.47274C4.32103 8.45872 3.85745 8.91065 3.85745 9.47274V15.046L3.86234 15.1475C3.91 15.618 4.28455 15.992 4.75491 16.0401L4.85745 16.046H5.74124L9.98441 19.9298C10.5858 20.4801 11.5313 20.1149 11.6475 19.3507L11.6592 19.1925V4.962Z" fill="currentColor"/>
+        <path d="M18.4805 7.23153C18.832 6.88044 19.4026 6.88021 19.7539 7.23153C21.0763 8.55385 21.8227 10.3459 21.8301 12.2159C21.8374 14.0861 21.104 15.8842 19.792 17.2169C19.4433 17.5706 18.8736 17.5751 18.5196 17.2266C18.1654 16.8779 18.1611 16.3074 18.5098 15.9532C19.4884 14.959 20.0348 13.6178 20.0293 12.2227C20.0237 10.8277 19.467 9.4914 18.4805 8.50497C18.129 8.15352 18.129 7.58302 18.4805 7.23153Z" fill="currentColor"/>
+        <path d="M15.293 8.87216C15.6445 8.521 16.2151 8.5208 16.5664 8.87216C17.4558 9.76156 17.9579 10.967 17.9629 12.2247C17.9677 13.4826 17.4744 14.6926 16.5918 15.589C16.2432 15.9427 15.6735 15.9469 15.3194 15.5987C14.9652 15.2499 14.9608 14.6794 15.3096 14.3253C15.8586 13.7675 16.165 13.0151 16.1621 12.2325C16.1591 11.4496 15.8465 10.6992 15.293 10.1456C14.9415 9.79414 14.9416 9.22364 15.293 8.87216Z" fill="currentColor"/>
+      </svg>
+      <input type="range" id="volume" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
+    </div>
+  </div>
+
+  <audio id="radio-audio" preload="none" crossorigin="anonymous"></audio>
+
+  <script>
+    (function() {
+      var audio = document.getElementById('radio-audio');
+      var btn = document.getElementById('play-btn');
+      var iconPlay = document.getElementById('icon-play');
+      var iconStop = document.getElementById('icon-stop');
+      var status = document.getElementById('player-status');
+      var vol = document.getElementById('volume');
+      var pill = document.getElementById('live-pill');
+      var playing = false;
+      var isStopping = false;  // FLAG per evitare falso errore
+
+      audio.volume = 0.8;
+
+      // Gestione errore — ignora se stiamo fermando manualmente
+      audio.addEventListener('error', function() {
+        if (isStopping) return;
+        var err = audio.error;
+        var msg = 'Stream non disponibile';
+        if (err) {
+          switch (err.code) {
+            case 1: msg = 'Download interrotto'; break;
+            case 2: msg = 'Errore di rete'; break;
+            case 3: msg = 'Formato non supportato'; break;
+            case 4: msg = 'Stream non raggiungibile'; break;
+          }
+        }
+        status.textContent = msg;
+        status.classList.add('error');
+        playing = false;
+        iconPlay.style.display = '';
+        iconStop.style.display = 'none';
+        pill.classList.remove('playing');
+      });
+
+      btn.addEventListener('click', function() {
+        if (playing) {
+          // STOP pulito — attiva flag per ignorare errori
+          isStopping = true;
+          audio.pause();
+          audio.removeAttribute('src');
+          audio.load();
+          playing = false;
+          iconPlay.style.display = '';
+          iconStop.style.display = 'none';
+          status.textContent = 'Clicca play per ascoltare';
+          status.classList.remove('error');
+          pill.classList.remove('playing');
+          // Rilascia flag dopo breve delay
+          setTimeout(function() { isStopping = false; }, 200);
+        } else {
+          status.textContent = 'Connessione in corso...';
+          status.classList.remove('error');
+          audio.src = 'https://nr12.newradio.it:8664/stream';
+          audio.play().then(function() {
+            playing = true;
+            iconPlay.style.display = 'none';
+            iconStop.style.display = '';
+            status.textContent = 'Streaming in corso...';
+            pill.classList.add('playing');
+          }).catch(function(err) {
+            // REINDIRIZZAMENTO AUTOMATICO su errore play
+            status.textContent = 'Apertura pannello...';
+            window.location.href = 'https://nr12.newradio.it/public/8664';
+          });
+        }
+      });
+
+      vol.addEventListener('input', function() {
+        audio.volume = vol.value;
+      });
+    })();
+  </script>
+</body>
+</html>
